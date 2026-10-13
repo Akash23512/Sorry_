@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14102b">
+<title>Heartbeat, ek chitthi tumhare liye 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;overflow:hidden;background:#14102b}
+body{
+  font-family:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  font-size:18px;line-height:1.55;color:#fff;
+}
+h1,h2,.script{font-family:"Caveat","Comic Sans MS",cursive;font-weight:700;line-height:1.05;margin:0}
+h1{font-size:3.6rem}
+h2{font-size:2.5rem;margin-bottom:6px}
+p{margin:0}
+button{font:inherit;color:inherit}
+
+/* ---------- Sky (background changes as the story goes on) ---------- */
+.sky{position:fixed;inset:0;opacity:0;transition:opacity 2s ease}
+.sky.on{opacity:1}
+.sky0{background:linear-gradient(180deg,#120e28 0%,#2a1a47 100%)}
+.sky1{background:linear-gradient(180deg,#2f1c4f 0%,#8b3f70 100%)}
+.sky2{background:linear-gradient(180deg,#a0407a 0%,#ee6a84 100%)}
+.sky3{background:linear-gradient(180deg,#ff6b8e 0%,#ffa07a 100%)}
+.stars{position:fixed;inset:0;transition:opacity 2s ease;pointer-events:none}
+.stars i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;opacity:.8;animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
+.sun{position:fixed;left:50%;bottom:-120px;width:300px;height:300px;margin-left:-150px;border-radius:50%;
+  background:radial-gradient(circle,#fff6c9 0%,#ffd98a 45%,rgba(255,217,138,0) 70%);
+  opacity:0;transform:translateY(80px);transition:opacity 2s ease,transform 2.4s ease;pointer-events:none}
+body.s3 .sun{opacity:.9;transform:translateY(-40px)}
+
+/* ---------- Pages ---------- */
+.page{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:calc(64px + env(safe-area-inset-top,0px)) 24px calc(110px + env(safe-area-inset-bottom,0px));
+  overflow-y:auto;
+  opacity:0;visibility:hidden;transform:translateX(40px);
+  transition:opacity .5s ease,transform .5s ease,visibility 0s .5s;
+}
+.page.active{opacity:1;visibility:visible;transform:none;transition:opacity .5s ease,transform .5s ease}
+.page.past{transform:translateX(-40px)}
+.inner{width:100%;max-width:440px;margin:auto 0}
+.sub{opacity:.85;margin-top:8px}
+.hint{opacity:.7;font-size:.95rem;margin-top:18px}
+
+/* ---------- Top bar ---------- */
+.top{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(14px + env(safe-area-inset-top,0px)) 16px 8px}
+.dots{display:flex;gap:6px}
+.dots b{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s}
+.dots b.on{background:#fff;width:22px;border-radius:6px}
+.icon-btn{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);cursor:pointer;font-size:1.2rem}
+
+/* ---------- Bottom nav ---------- */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:center;gap:12px;
+  padding:12px 20px calc(20px + env(safe-area-inset-bottom,0px));transition:opacity .4s}
+.nav.hide{opacity:0;pointer-events:none}
+.btn{border:0;border-radius:999px;cursor:pointer;font-weight:600;padding:14px 34px;font-size:1.1rem;
+  background:#fff;color:#a8306a;box-shadow:0 6px 0 rgba(0,0,0,.18);transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn.ghost{background:rgba(255,255,255,.16);color:#fff;box-shadow:none;padding:14px 20px;backdrop-filter:blur(6px)}
+.btn:focus-visible,.icon-btn:focus-visible,.card:focus-visible,.gift:focus-visible,.promise:focus-visible,.envelope:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.nav .btn[hidden]{display:none}
+
+/* ---------- Cover ---------- */
+.envelope{width:180px;height:180px;border-radius:50%;border:0;cursor:pointer;margin-top:30px;
+  background:rgba(255,255,255,.12);font-size:5.4rem;display:grid;place-items:center;
+  box-shadow:0 0 0 12px rgba(255,255,255,.07),0 0 60px rgba(255,170,200,.45);
+  animation:beat 2.2s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+
+/* ---------- Letter ---------- */
+.paper{background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border-radius:26px;padding:26px 22px;text-align:left;min-height:300px}
+.paper p{margin-bottom:12px;font-size:1.05rem}
+.paper .sign{font-family:"Caveat",cursive;font-size:2rem;text-align:right;margin:8px 0 0}
+.caret::after{content:"▍";opacity:.7;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* ---------- Cards ---------- */
+.stack{display:flex;flex-direction:column;gap:14px;margin-top:22px}
+.card{border:0;text-align:left;cursor:pointer;width:100%;border-radius:22px;padding:18px 20px;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);transition:background .3s}
+.card .t{font-weight:600;font-size:1.1rem;display:flex;justify-content:space-between;align-items:center}
+.card .b{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s ease,opacity .4s ease,margin .3s;font-size:1rem;line-height:1.5}
+.card.open{background:rgba(255,255,255,.24)}
+.card.open .b{max-height:200px;opacity:1;margin-top:10px}
+
+/* ---------- Promises ---------- */
+.promise{border:0;width:100%;text-align:left;cursor:pointer;display:flex;align-items:center;gap:14px;
+  border-radius:22px;padding:14px 16px;background:rgba(255,255,255,.14);backdrop-filter:blur(6px)}
+.promise .seal{flex:none;width:44px;height:44px;border-radius:50%;border:2px dashed rgba(255,255,255,.6);display:grid;place-items:center;font-size:1.4rem;transition:all .3s}
+.promise.done{background:rgba(255,255,255,.26)}
+.promise.done .seal{border:2px solid #fff;background:#ff5f90;animation:stamp .45s ease-out}
+@keyframes stamp{0%{transform:scale(2.2) rotate(-25deg);opacity:0}70%{transform:scale(.9)}100%{transform:none;opacity:1}}
+.promise .seal span{opacity:0}
+.promise.done .seal span{opacity:1}
+
+/* ---------- Reasons ---------- */
+.reason{min-height:230px;border:0;cursor:pointer;width:100%;border-radius:30px;padding:30px 24px;margin-top:22px;
+  background:rgba(255,255,255,.16);backdrop-filter:blur(8px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:14px}
+.reason .em{font-size:3.4rem;line-height:1}
+.reason .tx{font-size:1.3rem;line-height:1.4;font-weight:500}
+.reason.swap{animation:swap .45s ease-out}
+@keyframes swap{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.count{margin-top:14px;opacity:.8}
+
+/* ---------- Memories ---------- */
+.polas{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+.pola{background:#fff;color:#5a2a3c;padding:8px 8px 10px;border-radius:6px;box-shadow:0 8px 18px rgba(0,0,0,.3);transform:rotate(-3deg)}
+.pola:nth-child(even){transform:rotate(3deg)}
+.pola img{width:100%;aspect-ratio:1;object-fit:cover;display:block;border-radius:3px}
+.pola figcaption{font-family:"Caveat",cursive;font-size:1.25rem;margin-top:6px;line-height:1.1}
+figure{margin:0}
+
+/* ---------- Gifts ---------- */
+.gifts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.gift{border:0;cursor:pointer;border-radius:24px;min-height:160px;padding:14px 10px;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.gift .big{font-size:3.2rem;line-height:1}
+.gift .reveal{display:none;font-size:.9rem;line-height:1.3}
+.gift .reveal b{display:block;font-size:1.05rem;margin-bottom:2px}
+.gift.open{background:rgba(255,255,255,.3);animation:pop .4s ease-out}
+.gift.open .closed{display:none}
+.gift.open .reveal{display:block}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.07)}100%{transform:scale(1)}}
+
+/* ---------- Ask ---------- */
+.ask-pic{font-size:4.6rem;line-height:1}
+.arena{position:relative;height:170px;margin-top:22px}
+.yes,.no{position:absolute;left:50%}
+.yes{top:0;transform:translateX(-50%);background:#fff;color:#c0306a;transition:font-size .2s,padding .2s}
+.yes:active{transform:translateX(-50%) translateY(4px)}
+.no{bottom:0;transform:translateX(-50%);background:rgba(255,255,255,.2);color:#fff;box-shadow:none;transition:left .18s ease-out,top .18s ease-out}
+.dodge-msg{min-height:1.6em;opacity:.9;margin-top:6px}
+
+/* ---------- Final ---------- */
+.final-pic{font-size:5rem;line-height:1}
+.script.big{font-size:3rem;margin:10px 0}
+.final-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+
+/* ---------- Confetti ---------- */
+.rain{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.rain span{position:absolute;top:-10%;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
+
+@media (prefers-reduced-motion:reduce){
+  .envelope,.stars i,.caret::after{animation:none}
+  .page,.page.active{transition:opacity .2s}
+  .rain{display:none}
+}
+</style>
+</head>
+<body class="s0">
+
+<!--
+  GITHUB PAGES: rename this file to index.html, upload it to a repo,
+  then Settings > Pages > Deploy from branch (main, /root).
+  Edit the CONFIG block near the bottom to personalise everything.
+-->
+
+<div class="sky sky0 on"></div>
+<div class="sky sky1"></div>
+<div class="sky sky2"></div>
+<div class="sky sky3"></div>
+<div class="stars" id="stars"></div>
+<div class="sun"></div>
+
+<div class="top">
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <button class="icon-btn" id="mute" type="button" aria-label="Music on/off">🔊</button>
+</div>
+
+<!-- 1. Cover -->
+<section class="page" data-id="cover" data-sky="0" data-nonav>
+  <div class="inner">
+    <h1 id="coverName">Heartbeat</h1>
+    <p class="sub">ek chhoti si chitthi, sirf tumhare liye</p>
+    <button class="envelope" id="env" type="button" aria-label="Chitthi kholo">💌</button>
+    <p class="hint">kholne ke liye tap karo 👆<br>(music on karke dekhna 🎧)</p>
+  </div>
+</section>
+
+<!-- 2. Letter -->
+<section class="page" data-id="letter" data-sky="0" data-gate>
+  <div class="inner">
+    <div class="paper" id="paper"><div id="letterBox"></div></div>
+    <p class="hint" id="skipHint">skip karne ke liye tap karo</p>
+  </div>
+</section>
+
+<!-- 3. Understand -->
+<section class="page" data-id="understand" data-sky="0" data-gate>
+  <div class="inner">
+    <h2>Jo mujhe samajh aaya</h2>
+    <p class="sub">ek ek karke kholo</p>
+    <div class="stack" id="understandStack"></div>
+  </div>
+</section>
+
+<!-- 4. Promises -->
+<section class="page" data-id="promises" data-sky="1" data-gate>
+  <div class="inner">
+    <h2>Meri chhoti si promises</h2>
+    <p class="sub">har promise par tap karke seal kar do 🤞</p>
+    <div class="stack" id="promiseStack"></div>
+  </div>
+</section>
+
+<!-- 5. Reasons -->
+<section class="page" data-id="reasons" data-sky="1" data-gate>
+  <div class="inner">
+    <h2>Tumhare baare me jo pasand hai</h2>
+    <button class="reason" id="reason" type="button"></button>
+    <p class="count" id="reasonCount"></p>
+  </div>
+</section>
+
+<!-- 6. Memories (removed automatically if CONFIG.PHOTOS is empty) -->
+<section class="page" data-id="memories" data-sky="1">
+  <div class="inner">
+    <h2>Hamari yaadein 📸</h2>
+    <div class="polas" id="polas"></div>
+  </div>
+</section>
+
+<!-- 7. Gifts -->
+<section class="page" data-id="gifts" data-sky="2" data-gate>
+  <div class="inner">
+    <h2>4 gifts tumhare liye 🎁</h2>
+    <p class="sub">sab kholo</p>
+    <div class="gifts" id="gifts"></div>
+  </div>
+</section>
+
+<!-- 8. Ask -->
+<section class="page" data-id="ask" data-sky="2" data-nonav>
+  <div class="inner">
+    <div class="ask-pic">🥹</div>
+    <h2 style="margin-top:10px">Maaf kar do na?</h2>
+    <div class="arena" id="arena">
+      <button class="btn yes" id="yes" type="button">Haan, maaf kiya 💗</button>
+      <button class="btn no" id="no" type="button">Nahi 😤</button>
+    </div>
+    <p class="dodge-msg" id="msg"></p>
+  </div>
+</section>
+
+<!-- 9. Final -->
+<section class="page" data-id="final" data-sky="3" data-nonav>
+  <div class="inner">
+    <div class="final-pic">🥳</div>
+    <p class="script big" id="thanks">Thank you Heartbeat 💖</p>
+    <p>Tumne mujhe maaf kiya, mere liye ye bahut matlab rakhta hai.<br>Ab ek cute si smile bhej do 😊</p>
+    <p style="font-size:2rem;margin-top:16px">🌸🧸🍫💌✨</p>
+    <div class="final-row">
+      <button class="btn ghost" id="again" type="button">🎵 Gaana phir se</button>
+      <button class="btn ghost" id="replay" type="button">↺ Shuru se</button>
+    </div>
+  </div>
+</section>
+
+<div class="nav hide" id="nav">
+  <button class="btn ghost" id="back" type="button" aria-label="Peeche">‹</button>
+  <button class="btn" id="next" type="button">Aage 💗</button>
+</div>
+
+<div class="rain" id="rain" aria-hidden="true"></div>
+<audio id="song" loop preload="auto"></audio>
+
+<script>
+/* =====================================================
+   CONFIG: edit this part to personalise everything
+   ===================================================== */
+const CONFIG = {
+  HER_NAME: "Heartbeat",
+  YOUR_NAME: "Tumhara bewakoof 🧸",
+
+  // Optional: put your own song file next to this html (e.g. "song.mp3") and write its name here.
+  // Leave empty "" to use the built-in music box lullaby.
+  SONG_FILE: "",
+
+  // Optional photos for the "Yaadein" page. Put images in a "photos" folder.
+  // Example: [{src:"photos/1.jpg", caption:"Hamari pehli selfie"}]
+  PHOTOS: [],
+
+  LETTER: [
+    "Heartbeat 🌸",
+    "Mujhe pata hai ki kal aur aaj mai tumhe pareshan kar raha tha. Sirf reply ke liye gussa karna, taane marna... ye sab galat tha.",
+    "Tum thaki hui thi, sir dard tha, aur mai samajhne ki jagah shikayat kar raha tha. Iske liye dil se sorry. 🥺",
+    "Mai tumse ladna nahi chahta. Mai bas tumhare saath rehna chahta hu, chahe tum kitni bhi der me reply karo. 💗"
+  ],
+
+  UNDERSTAND: [
+    {t:"Mai kahan galat tha", b:"Tum busy ya thaki hui thi aur mai har baar reply ka hisaab maang raha tha. Wo pyaar nahi, pressure tha."},
+    {t:"Jo mai bola", b:"Taane, sarcasm aur 'block kar do' jaisi baatein. Gusse me bola, par chubhi tumhe hogi. Sorry."},
+    {t:"Paise wali baat", b:"Wo baat kabhi honi hi nahi chahiye thi. Tum meri life me hisaab ke liye nahi ho, tum meri priority ho."}
+  ],
+
+  PROMISES: [
+    "Tumhari chuppi ko rejection nahi samjhunga",
+    "Reply ke liye baar baar nahi bolunga",
+    "Gusse me taane nahi, shaanti se baat karunga",
+    "Jab tumhe space chahiye hoga, bina sawal ke dunga"
+  ],
+
+  REASONS: [
+    {e:"😊", t:"Tumhari hasi, jo bad mood bhi theek kar deti hai"},
+    {e:"🙏", t:"Tumhari shraddha aur tumhara shaant sa swabhav mujhe sukoon deta hai"},
+    {e:"☀️", t:"Tumhara ek 'Mrng' bhi mera poora din bana deta hai"},
+    {e:"🌸", t:"Tumhare saath normal si baatein bhi special lagti hain"},
+    {e:"💗", t:"Tum jaisi ho, waisi hi mujhe sabse zyada pasand ho"}
+  ],
+
+  GIFTS: [
+    {e:"🍫", t:"Chocolate", b:"1 Dairy Milk Silk, jab bolo tab"},
+    {e:"🧸", t:"Teddy hug", b:"Unlimited hugs, kabhi expire nahi"},
+    {e:"🍦", t:"Treat date", b:"Ice cream ya golgappe, tum choose karo"},
+    {e:"🎫", t:"No-tension pass", b:"1 din, na sawal na complain"}
+  ],
+
+  DODGE_LINES: [
+    "Pakad ke dikha 😝",
+    "Are bhaag gaya 🏃",
+    "Itna bhi gussa nahi hona chahiye 🥺",
+    "Please na? 🥹",
+    "Dekho Haan wala kitna bada ho gaya 👀",
+    "Last chance... Haan dabao 💗"
+  ]
+};
+
+/* =====================================================
+   Helpers
+   ===================================================== */
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const sleepRaw = ms => new Promise(r => setTimeout(r, ms));
+
+document.title = CONFIG.HER_NAME + ", ek chitthi tumhare liye 💌";
+$('#coverName').textContent = CONFIG.HER_NAME + " 🥺";
+$('#thanks').textContent = "Thank you " + CONFIG.HER_NAME + " 💖";
+
+/* Stars */
+(function(){
+  const st = $('#stars');
+  for(let i=0;i<55;i++){
+    const d = document.createElement('i');
+    d.style.left = Math.random()*100+'%';
+    d.style.top = Math.random()*70+'%';
+    d.style.animationDelay = (Math.random()*3)+'s';
+    d.style.transform = 'scale('+(0.5+Math.random()*1.1)+')';
+    st.appendChild(d);
+  }
+})();
+
+/* Build content */
+(function build(){
+  $('#understandStack').innerHTML = CONFIG.UNDERSTAND.map(c =>
+    `<button class="card" type="button"><div class="t"><span></span><span>＋</span></div><div class="b"></div></button>`).join('');
+  $$('#understandStack .card').forEach((el,i)=>{
+    $('.t span',el).textContent = CONFIG.UNDERSTAND[i].t;
+    $('.b',el).textContent = CONFIG.UNDERSTAND[i].b;
+  });
+
+  $('#promiseStack').innerHTML = CONFIG.PROMISES.map(()=>
+    `<button class="promise" type="button"><span class="seal"><span>💗</span></span><span class="ptx"></span></button>`).join('');
+  $$('#promiseStack .promise').forEach((el,i)=>{ $('.ptx',el).textContent = CONFIG.PROMISES[i]; });
+
+  $('#gifts').innerHTML = CONFIG.GIFTS.map(()=>
+    `<button class="gift" type="button"><span class="closed big">🎁</span><span class="reveal"><span class="big"></span><b></b><span class="gb"></span></span></button>`).join('');
+  $$('#gifts .gift').forEach((el,i)=>{
+    const g = CONFIG.GIFTS[i];
+    $('.reveal .big',el).textContent = g.e;
+    $('.reveal b',el).textContent = g.t;
+    $('.reveal .gb',el).textContent = g.b;
+  });
+
+  if(CONFIG.PHOTOS.length){
+    $('#polas').innerHTML = CONFIG.PHOTOS.slice(0,4).map(()=>
+      `<figure class="pola"><img alt=""><figcaption></figcaption></figure>`).join('');
+    $$('#polas figure').forEach((el,i)=>{
+      $('img',el).src = CONFIG.PHOTOS[i].src;
+      $('figcaption',el).textContent = CONFIG.PHOTOS[i].caption || '';
+    });
+  } else {
+    $('[data-id="memories"]').remove();
+  }
+})();
+
+/* =====================================================
+   Confetti
+   ===================================================== */
+const rain = $('#rain');
+const EMOJIS = ['💗','🌸','🧸','🍫','✨','💌','🥰','🎀','🍦','💖'];
+function burst(n){
+  for(let i=0;i<n;i++){
+    const el = document.createElement('span');
+    el.textContent = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    el.style.left = Math.random()*100+'%';
+    el.style.fontSize = (20+Math.random()*22)+'px';
+    el.style.animationDuration = (2.6+Math.random()*2.4)+'s';
+    el.style.animationDelay = (Math.random()*0.8)+'s';
+    rain.appendChild(el);
+    setTimeout(()=>el.remove(), 6500);
+  }
+}
+
+/* =====================================================
+   Music (built-in music box lullaby, or your own file)
+   ===================================================== */
+const song = $('#song');
+let ac=null, master=null, timer=null, nextTime=0, step=0, muted=false, started=false;
+
+const BARS = [
+  {bass:130.81, hi:1318.5, arp:[659.25,783.99,1046.5,783.99,659.25,783.99,1046.5,0]},
+  {bass:110.00, hi:1318.5, arp:[659.25,880.00,1046.5,880.00,659.25,880.00,1046.5,0]},
+  {bass:87.31,  hi:1396.9, arp:[523.25,698.46,880.00,698.46,523.25,698.46,880.00,0]},
+  {bass:98.00,  hi:1174.7, arp:[587.33,783.99,987.77,783.99,587.33,783.99,987.77,0]}
+];
+const EIGHTH = 60/76/2;
+
+function tone(freq, t, dur, vol, type){
+  const o = ac.createOscillator(), g = ac.createGain();
+  o.type = type || 'triangle';
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+  o.connect(g); g.connect(master);
+  o.start(t); o.stop(t+dur+0.05);
+  // soft bell overtone
+  const o2 = ac.createOscillator(), g2 = ac.createGain();
+  o2.type = 'sine'; o2.frequency.value = freq*2;
+  g2.gain.setValueAtTime(0.0001, t);
+  g2.gain.exponentialRampToValueAtTime(vol*0.25, t+0.01);
+  g2.gain.exponentialRampToValueAtTime(0.0001, t+dur*0.6);
+  o2.connect(g2); g2.connect(master);
+  o2.start(t); o2.stop(t+dur);
+}
+function scheduleStep(s, t){
+  const bar = BARS[Math.floor(s/8)%BARS.length];
+  const i = s%8;
+  if(i===0){
+    tone(bar.bass, t, 2.4, 0.16, 'sine');
+    tone(bar.hi, t, 1.8, 0.07, 'triangle');
+  }
+  if(bar.arp[i]) tone(bar.arp[i], t, 1.2, 0.09, 'triangle');
+}
+function startBuiltIn(){
+  if(!ac){
+    ac = new (window.AudioContext||window.webkitAudioContext)();
+    master = ac.createGain(); master.gain.value = 0.55;
+    const delay = ac.createDelay(); delay.delayTime.value = 0.34;
+    const fb = ac.createGain(); fb.gain.value = 0.32;
+    const wet = ac.createGain(); wet.gain.value = 0.45;
+    master.connect(ac.destination);
+    master.connect(delay); delay.connect(fb); fb.connect(delay); delay.connect(wet); wet.connect(ac.destination);
+  }
+  if(ac.state==='suspended') ac.resume();
+  if(timer) return;
+  nextTime = ac.currentTime+0.15; step = 0;
+  timer = setInterval(()=>{
+    while(nextTime < ac.currentTime+0.5){ scheduleStep(step, nextTime); nextTime += EIGHTH; step++; }
+  }, 120);
+}
+function startMusic(){
+  if(started){ return; }
+  started = true;
+  if(CONFIG.SONG_FILE){
+    song.src = CONFIG.SONG_FILE;
+    song.volume = 0.7;
+    song.play().catch(()=>{ CONFIG.SONG_FILE=''; startBuiltIn(); });
+  } else { startBuiltIn(); }
+}
+function setMuted(m){
+  muted = m;
+  $('#mute').textContent = m ? '🔇' : '🔊';
+  if(CONFIG.SONG_FILE){ m ? song.pause() : song.play().catch(()=>{}); }
+  else if(ac){ m ? ac.suspend() : ac.resume(); }
+}
+$('#mute').addEventListener('click', ()=>{
+  if(!started){ startMusic(); setMuted(false); return; }
+  setMuted(!muted);
+});
+$('#again').addEventListener('click', ()=>{
+  started=false;
+  if(CONFIG.SONG_FILE){ song.currentTime=0; }
+  startMusic(); setMuted(false); burst(20);
+});
+document.addEventListener('visibilitychange', ()=>{
+  if(muted||!started) return;
+  if(document.hidden){ CONFIG.SONG_FILE ? song.pause() : (ac && ac.suspend()); }
+  else { CONFIG.SONG_FILE ? song.play().catch(()=>{}) : (ac && ac.resume()); }
+});
+
+/* =====================================================
+   Page navigation
+   ===================================================== */
+const pages = $$('.page');
+const nav = $('#nav'), nextBtn = $('#next'), backBtn = $('#back');
+const unlocked = new Set();
+let idx = 0;
+
+$('#dots').innerHTML = pages.map(()=>'<b></b>').join('');
+const dots = $$('#dots b');
+
+function updateNav(){
+  const p = pages[idx];
+  const hideNav = p.hasAttribute('data-nonav') || (p.hasAttribute('data-gate') && !unlocked.has(idx));
+  nav.classList.toggle('hide', hideNav);
+  backBtn.hidden = idx===0;
+}
+function setSky(n){
+  $$('.sky').forEach((s,i)=>s.classList.toggle('on', i===n));
+  $('#stars').style.opacity = n===0 ? 1 : n===1 ? .35 : 0;
+  document.body.className = 's'+n;
+  $('meta[name="theme-color"]').content = ['#14102b','#2f1c4f','#a0407a','#ff6b8e'][n];
+}
+function go(n){
+  if(n<0||n>=pages.length) return;
+  pages.forEach((p,i)=>{
+    p.classList.toggle('active', i===n);
+    p.classList.toggle('past', i<n);
+  });
+  idx = n;
+  dots.forEach((d,i)=>d.classList.toggle('on', i===n));
+  setSky(+pages[n].dataset.sky);
+  pages[n].scrollTop = 0;
+  updateNav();
+  const id = pages[n].dataset.id;
+  if(enter[id]) enter[id]();
+}
+function unlock(){ unlocked.add(idx); updateNav(); }
+function pageIndex(id){ return pages.findIndex(p=>p.dataset.id===id); }
+
+nextBtn.addEventListener('click', ()=>go(idx+1));
+backBtn.addEventListener('click', ()=>go(idx-1));
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight' && !nav.classList.contains('hide')) go(idx+1);
+  if(e.key==='ArrowLeft') go(idx-1);
+});
+
+/* =====================================================
+   Page behaviours
+   ===================================================== */
+let typed = false, skipTyping = false;
+const wait = ms => skipTyping ? Promise.resolve() : sleepRaw(ms);
+
+async function typeLetter(){
+  if(typed) return; typed = true;
+  const box = $('#letterBox'); box.innerHTML='';
+  for(const para of CONFIG.LETTER){
+    const p = document.createElement('p'); box.appendChild(p);
+    p.classList.add('caret');
+    const chars = Array.from(para);
+    for(let i=1;i<=chars.length;i++){
+      p.textContent = chars.slice(0,i).join('');
+      await wait(30);
+    }
+    p.classList.remove('caret');
+    await wait(450);
+  }
+  const s = document.createElement('p'); s.className='sign'; s.textContent = '— ' + CONFIG.YOUR_NAME;
+  box.appendChild(s);
+  $('#skipHint').style.visibility='hidden';
+  const li = pageIndex('letter');
+  unlocked.add(li); if(idx===li) updateNav();
+}
+$('[data-id="letter"]').addEventListener('click', ()=>{ skipTyping = true; });
+
+const enter = {
+  letter: typeLetter
+};
+
+/* Cover */
+$('#env').addEventListener('click', ()=>{
+  startMusic(); setMuted(false);
+  burst(16);
+  setTimeout(()=>go(1), 500);
+});
+
+/* Understand cards */
+(function(){
+  const cards = $$('#understandStack .card');
+  const opened = new Set();
+  cards.forEach((c,i)=>c.addEventListener('click', ()=>{
+    c.classList.toggle('open');
+    $('.t span:last-child', c).textContent = c.classList.contains('open') ? '－' : '＋';
+    opened.add(i);
+    if(opened.size===cards.length){ unlocked.add(pageIndex('understand')); updateNav(); }
+  }));
+})();
+
+/* Promises */
+(function(){
+  const items = $$('#promiseStack .promise');
+  let done = 0;
+  items.forEach(el=>el.addEventListener('click', ()=>{
+    if(el.classList.contains('done')) return;
+    el.classList.add('done'); done++;
+    burst(6);
+    if(done===items.length){ unlocked.add(pageIndex('promises')); updateNav(); }
+  }));
+})();
+
+/* Reasons */
+(function(){
+  const btn = $('#reason'), count = $('#reasonCount');
+  const R = CONFIG.REASONS;
+  let i = 0, seen = 1;
+  function show(){
+    const r = R[i];
+    btn.innerHTML = '<span class="em"></span><span class="tx"></span>';
+    $('.em',btn).textContent = r.e;
+    $('.tx',btn).textContent = r.t;
+    btn.classList.remove('swap'); void btn.offsetWidth; btn.classList.add('swap');
+    count.textContent = (i+1)+' / '+R.length + (i<R.length-1 ? '  ·  agla dekhne ke liye tap karo' : '');
+  }
+  show();
+  btn.addEventListener('click', ()=>{
+    if(i<R.length-1){ i++; seen++; show(); burst(4); }
+    if(seen===R.length){ unlocked.add(pageIndex('reasons')); updateNav(); }
+  });
+})();
+
+/* Gifts */
+(function(){
+  const g = $$('#gifts .gift');
+  let n = 0;
+  g.forEach(el=>el.addEventListener('click', ()=>{
+    if(el.classList.contains('open')) return;
+    el.classList.add('open'); n++; burst(8);
+    if(n===g.length){ unlocked.add(pageIndex('gifts')); updateNav(); }
+  }));
+})();
+
+/* Ask: the No button runs away */
+(function(){
+  const arena = $('#arena'), yes = $('#yes'), no = $('#no'), msg = $('#msg');
+  let tries = 0;
+  function dodge(e){
+    if(e) e.preventDefault();
+    tries++;
+    const aw = arena.clientWidth, ah = arena.clientHeight;
+    const bw = no.offsetWidth, bh = no.offsetHeight;
+    no.style.transform = 'none';
+    no.style.bottom = 'auto';
+    no.style.left = Math.random()*(aw-bw)+'px';
+    no.style.top = Math.random()*(ah-bh)+'px';
+    msg.textContent = CONFIG.DODGE_LINES[Math.min(tries-1, CONFIG.DODGE_LINES.length-1)];
+    yes.style.fontSize = (1.1+Math.min(tries,8)*0.12)+'rem';
+    yes.style.padding = (14+tries*2)+'px '+(34+tries*3)+'px';
+    if(tries>=7) no.textContent = 'Haan 💗';
+  }
+  no.addEventListener('mouseenter', e=>{ if(matchMedia('(hover:hover)').matches) dodge(e); });
+  no.addEventListener('touchstart', dodge, {passive:false});
+  no.addEventListener('click', e=>{ no.textContent==='Haan 💗' ? yes.click() : dodge(e); });
+  yes.addEventListener('click', ()=>{
+    burst(70);
+    setTimeout(()=>go(pageIndex('final')), 900);
+  });
+})();
+
+/* Final: replay */
+$('#replay').addEventListener('click', ()=>{ location.reload(); });
+
+go(0);
+</script>
+</body>
+</html>
